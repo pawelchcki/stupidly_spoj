@@ -5,61 +5,71 @@ list=""
 #  read v
 #done
 
-values=()
+values=( )
+helpers=( )
 
-retr(){
+retrv(){
   local no=$1
-  local cnt=0
-  local r=xx
-  for elem in $list; do
-    if [ $no -gt $elem ]; then
-      r="$elem ${values[$cnt]}"
-      cnt=$(($cnt+1))
+  local len=${#helpers[*]}
+  local i=0
+  local elem=xx
+  unset rv_no
+  unset rv_cnt
+
+  for ((i=0; i<$len; i++)); do
+    if [ $no -gt ${helpers[$i]} ]; then
+      rv_no=${helpers[$i]}
+      rv_cnt=${values[$i]}
     else
       break
     fi
   done
-  echo $r
 }
-
-#retr 59
-#retr 61
-#retr 101
-
-#retr 1025
 
 reduce(){
-  local x=$1
-  local cnt=0
-  while [ $(($x % 10)) = 0 ]; do cnt=$(($cnt+1)); x=$(($x / 10)); done
-  x=$(($x % 100))
-  echo $cnt $x
+  rr_x=$1
+  rr_cnt=0
+  while [ $(($rr_x % 10)) = 0 ]; do 
+    rr_cnt=$(($rr_cnt+1)); rr_x=$(($rr_x / 10));
+  done
+  rr_x=$(($rr_x % 100))
 }
 
-
-INC=10
-cunt(){
+INC=100 #save helper every
+count(){
   local target=$(($1 + 1))
   local no=$(($2 + 1))
   local cnt=$3
   if [ xx$cnt = xx ]; then cnt=0; fi
-  #if [ xx$no = xx ]; then no=1; fi
 
   local memo=1
   while [ $no -lt $target ]; do
     memo=$(($memo * $no))
-    r=( $(reduce $memo) )
-    memo=${r[1]}
-    cnt=$((${r[0]} + $cnt))
-    if [ $(($no % $INC)) = 0 ]; then 
-      list="$list $no"
+    reduce $memo
+    memo=${rr_x}
+    cnt=$(($rr_cnt + $cnt))
+    if [ $(($no % $INC)) = 0 ]; then
       len=${#values[*]}
+      helpers[$len]=$no
       values[$len]=$cnt
-      echo dup ${values[@]} $list
+      #echo "dup ${values[@]} ${helpers[@]}"
     fi
     no=$(($no + 1))
   done 
-  echo $cnt
+  r_cnt=$cnt
 }
 
-cunt 100 #90 21 
+iCount(){
+  local no=$1
+  retrv $no
+  count $no $rv_no $rv_cnt
+  echo $r_cnt
+}
+
+
+iCount 1024
+iCount 1024
+iCount 1024
+iCount 1024
+iCount 3
+
